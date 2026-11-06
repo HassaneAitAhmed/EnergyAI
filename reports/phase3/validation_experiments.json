@@ -1,0 +1,90 @@
+[
+  {
+    "model": "ridge",
+    "params": {
+      "alpha": 0.1
+    },
+    "mae_mw": 440.71571741802865,
+    "rmse_mw": 608.1429919987957,
+    "wape_percent": 5.979378728670181,
+    "observations": 8780
+  },
+  {
+    "model": "ridge",
+    "params": {
+      "alpha": 1.0
+    },
+    "mae_mw": 440.6726189678407,
+    "rmse_mw": 608.1687122866796,
+    "wape_percent": 5.978793993553851,
+    "observations": 8780
+  },
+  {
+    "model": "ridge",
+    "params": {
+      "alpha": 10.0
+    },
+    "mae_mw": 440.44345883949103,
+    "rmse_mw": 608.4764673957924,
+    "wape_percent": 5.975684880030646,
+    "observations": 8780
+  },
+  {
+    "model": "ridge",
+    "params": {
+      "alpha": 100.0
+    },
+    "mae_mw": 439.9705142939819,
+    "rmse_mw": 610.2915211237889,
+    "wape_percent": 5.969268238999949,
+    "observations": 8780
+  },
+  {
+    "model": "hist_gradient_boosting",
+    "params": {
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 15,
+      "l2_regularization": 1.0
+    },
+    "mae_mw": 432.5173493336653,
+    "rmse_mw": 644.423935840943,
+    "wape_percent": 5.868147960635301,
+    "observations": 8780
+  },
+  {
+    "model": "hist_gradient_boosting",
+    "params": {
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 31,
+      "l2_regularization": 1.0
+    },
+    "mae_mw": 440.14041853656744,
+    "rmse_mw": 654.6234737490396,
+    "wape_percent": 5.971573402564296,
+    "observations": 8780
+  },
+  {
+    "model": "hist_gradient_boosting",
+    "params": {
+      "learning_rate": 0.1,
+      "max_leaf_nodes": 15,
+      "l2_regularization": 1.0
+    },
+    "mae_mw": 441.699712061077,
+    "rmse_mw": 655.0122740852996,
+    "wape_percent": 5.992729005062042,
+    "observations": 8780
+  },
+  {
+    "model": "hist_gradient_boosting",
+    "params": {
+      "learning_rate": 0.1,
+      "max_leaf_nodes": 31,
+      "l2_regularization": 1.0
+    },
+    "mae_mw": 446.3364911147483,
+    "rmse_mw": 666.1802401113404,
+    "wape_percent": 6.055638170647276,
+    "observations": 8780
+  }
+]

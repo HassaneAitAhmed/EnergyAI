@@ -1,0 +1,14 @@
+{
+  "naive_48h": {
+    "mae_mw": 608.789421737111,
+    "rmse_mw": 834.3876103855089,
+    "wape_percent": 8.28926886149779,
+    "observations": 8612
+  },
+  "seasonal_naive_168h": {
+    "mae_mw": 631.0735601486298,
+    "rmse_mw": 923.5200773588798,
+    "wape_percent": 8.592689400758863,
+    "observations": 8612
+  }
+}

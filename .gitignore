@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.py[cod]
+outputs/
+data/raw/
+data/interim/
+data/processed/
+.env
+EnergyAI_Complete_Project_Blueprint.md

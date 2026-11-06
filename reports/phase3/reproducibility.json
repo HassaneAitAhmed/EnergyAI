@@ -1,0 +1,41 @@
+{
+  "random_seed": 42,
+  "feature_columns": [
+    "hour_local",
+    "day_of_week_local",
+    "month_local",
+    "is_weekend",
+    "is_french_public_holiday",
+    "hour_sin",
+    "hour_cos",
+    "day_of_year_sin",
+    "day_of_year_cos",
+    "load_lag_48h_utc",
+    "load_lag_168h_utc",
+    "load_lag_336h_utc"
+  ],
+  "split_counts": {
+    "train": 17199,
+    "validation": 8780,
+    "test": 8732
+  },
+  "selected_model": "hist_gradient_boosting",
+  "selected_validation_experiment": {
+    "model": "hist_gradient_boosting",
+    "params": {
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 15,
+      "l2_regularization": 1.0
+    },
+    "mae_mw": 432.5173493336653,
+    "rmse_mw": 644.423935840943,
+    "wape_percent": 5.868147960635301,
+    "observations": 8780
+  },
+  "versions": {
+    "pandas": "2.3.3",
+    "numpy": "2.5.4",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0"
+  }
+}

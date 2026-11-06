@@ -1,0 +1,26 @@
+{
+  "naive_48h": {
+    "mae_mw": 632.7217704993129,
+    "rmse_mw": 846.3835998489221,
+    "wape_percent": 8.435925090126272,
+    "observations": 8732
+  },
+  "seasonal_naive_168h": {
+    "mae_mw": 615.6349060925332,
+    "rmse_mw": 930.8567725000979,
+    "wape_percent": 8.2081100932644,
+    "observations": 8732
+  },
+  "ridge": {
+    "mae_mw": 447.1253754349973,
+    "rmse_mw": 601.5102912977801,
+    "wape_percent": 5.961413608524347,
+    "observations": 8732
+  },
+  "hist_gradient_boosting": {
+    "mae_mw": 434.1845836453665,
+    "rmse_mw": 633.9953259941868,
+    "wape_percent": 5.788877186934022,
+    "observations": 8732
+  }
+}
