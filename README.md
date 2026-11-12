@@ -23,7 +23,8 @@ The project currently includes:
 - Temperature, precipitation, and wind aligned to each target UTC hour
 - Strict rejection of weather published after the demand forecast cutoff
 - A same-timestamp weather-versus-no-weather learning experiment
-- 40 automated tests
+- Expanding-window rolling backtests recorded with MLflow
+- 42 automated tests
 
 ## Pipeline
 
@@ -71,6 +72,15 @@ the full-year 2025 evaluation above.
 
 ![Weather comparison](reports/final_ml/comparison.png)
 
+## Rolling backtest
+
+Three chronological eight-day folds retrain using only earlier target days. On
+the same 576 evaluation timestamps, the no-weather model reached 218.33 MW MAE
+and the weather model reached 227.82 MW MAE. MLflow records the parameters,
+metrics, dataset checksum, Git commit, reports, and model artifacts locally.
+
+![Rolling-origin comparison](reports/phase5/rolling_backtest.png)
+
 ## Run locally
 
 ```powershell
@@ -89,6 +99,7 @@ py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m energyai.phase3
 .\.venv\Scripts\python.exe -m energyai.phase4 --start-date 2024-06-02 --end-date 2024-06-04
 .\.venv\Scripts\python.exe -m energyai.finalize_ml
+.\.venv\Scripts\python.exe -m energyai.phase5
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
@@ -108,6 +119,10 @@ reports/final_ml/comparison.png
 reports/final_ml/reproducibility.json
 artifacts/weather_comparison/no_weather.joblib
 artifacts/weather_comparison/with_weather.joblib
+reports/phase5/rolling_fold_metrics.csv
+reports/phase5/rolling_backtest.png
+reports/phase5/summary.json
+reports/phase5/mlflow_run.json
 ```
 
 ## Project structure

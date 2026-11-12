@@ -76,7 +76,8 @@ def chronological_day_splits(
     return train, validation, test
 
 
-def _tree_pipeline(feature_columns: list[str]) -> Pipeline:
+def weather_tree_pipeline(feature_columns: list[str]) -> Pipeline:
+    """Return the fixed gradient-boosting pipeline used in weather comparisons."""
     numeric = [
         column for column in feature_columns if column not in CATEGORICAL_FEATURES
     ]
@@ -115,7 +116,7 @@ def train_weather_comparison(
     metrics: dict[str, dict[str, MetricSet]] = {"validation": {}, "test": {}}
     predictions = test[["timestamp_utc", "actual_mw"]].copy()
     for name, columns in configurations.items():
-        model = _tree_pipeline(columns)
+        model = weather_tree_pipeline(columns)
         model.fit(train[columns], train["actual_mw"])
         models[name] = model
         validation_prediction = pd.Series(

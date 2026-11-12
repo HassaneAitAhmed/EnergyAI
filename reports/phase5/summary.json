@@ -1,0 +1,25 @@
+{
+  "folds": 3,
+  "initial_train_days": 36,
+  "evaluation_days_per_fold": 8,
+  "evaluation_rows": 576,
+  "same_evaluation_timestamps": true,
+  "aggregate_metrics": {
+    "no_weather": {
+      "mae_mw": 218.33050686637566,
+      "rmse_mw": 261.81275719972047,
+      "wape_percent": 3.61359938827293,
+      "observations": 576
+    },
+    "with_weather": {
+      "mae_mw": 227.8190560878132,
+      "rmse_mw": 275.0092560953415,
+      "wape_percent": 3.7706448518423863,
+      "observations": 576
+    }
+  },
+  "weather_relative_mae_improvement_percent": -4.3459566680000465,
+  "dataset_sha256": "b93cc24407c4c8ad3748acf2a29359358b0197e1f4b6e6a2cafdaa893ee7cd37",
+  "git_commit": "923d154c663248821f8fada8d29b3f4e2a5c8fea",
+  "conclusion": "Weather did not improve rolling-origin MAE."
+}

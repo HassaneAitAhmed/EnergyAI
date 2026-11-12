@@ -10,3 +10,5 @@ data/interim/
 data/processed/
 .env
 EnergyAI_Complete_Project_Blueprint.md
+mlflow.db
+mlruns/

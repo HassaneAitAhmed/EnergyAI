@@ -1,0 +1,5 @@
+{
+  "run_id": "f531a9f638eb47ad8eb9c92a0a03b355",
+  "experiment_name": "EnergyAI rolling backtests",
+  "tracking_uri": "sqlite:///C:/Users/hassa/Documents/EnergyAI/mlflow.db"
+}
