@@ -1,0 +1,30 @@
+{
+  "validation": {
+    "no_weather": {
+      "mae_mw": 238.06799478861578,
+      "rmse_mw": 281.3908391184551,
+      "wape_percent": 4.012804631756701,
+      "observations": 288
+    },
+    "with_weather": {
+      "mae_mw": 258.92472192742434,
+      "rmse_mw": 308.85234681835846,
+      "wape_percent": 4.3643595366493555,
+      "observations": 288
+    }
+  },
+  "test": {
+    "no_weather": {
+      "mae_mw": 180.7859596100269,
+      "rmse_mw": 232.90451898516864,
+      "wape_percent": 2.9390756119915986,
+      "observations": 288
+    },
+    "with_weather": {
+      "mae_mw": 191.17536006118507,
+      "rmse_mw": 248.14935668843745,
+      "wape_percent": 3.1079782942302026,
+      "observations": 288
+    }
+  }
+}

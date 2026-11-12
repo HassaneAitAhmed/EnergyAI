@@ -22,7 +22,8 @@ The project currently includes:
 - Archived ECMWF forecast-run download and checksum caching
 - Temperature, precipitation, and wind aligned to each target UTC hour
 - Strict rejection of weather published after the demand forecast cutoff
-- 37 automated tests
+- A same-timestamp weather-versus-no-weather learning experiment
+- 40 automated tests
 
 ## Pipeline
 
@@ -52,6 +53,24 @@ All models use the same 8,732 test timestamps.
 
 ![Actual demand, gradient boosting, and baseline predictions](reports/phase3/test_predictions.png)
 
+## Weather learning experiment
+
+This smaller experiment uses 60 chronological target days from May–June 2024:
+36 training days, 12 validation days, and 12 untouched test days. Both models
+use the same 288 test timestamps.
+
+| Test model | MAE | RMSE | WAPE |
+|---|---:|---:|---:|
+| Without weather | **180.79 MW** | **232.90 MW** | **2.94%** |
+| With archived weather | 191.18 MW | 248.15 MW | 3.11% |
+
+Archived weather made test MAE 5.75% worse in this limited experiment. This is
+an important ML result: adding features does not automatically improve a model.
+The experiment uses one representative Paris weather point and does not replace
+the full-year 2025 evaluation above.
+
+![Weather comparison](reports/final_ml/comparison.png)
+
 ## Run locally
 
 ```powershell
@@ -69,6 +88,7 @@ py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m energyai.phase2 --year 2024
 .\.venv\Scripts\python.exe -m energyai.phase3
 .\.venv\Scripts\python.exe -m energyai.phase4 --start-date 2024-06-02 --end-date 2024-06-04
+.\.venv\Scripts\python.exe -m energyai.finalize_ml
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
@@ -82,6 +102,12 @@ reports/phase3/error_slices.csv
 reports/phase3/model_card.md
 reports/phase3/reproducibility.json
 reports/phase4/weather_sample_summary.json
+reports/final_ml/metrics.json
+reports/final_ml/comparison.md
+reports/final_ml/comparison.png
+reports/final_ml/reproducibility.json
+artifacts/weather_comparison/no_weather.joblib
+artifacts/weather_comparison/with_weather.joblib
 ```
 
 ## Project structure
