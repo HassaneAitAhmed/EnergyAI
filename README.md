@@ -4,7 +4,8 @@ EnergyAI predicts hourly electricity demand for the next day in
 **Île-de-France** using official RTE data.
 
 At 18:00 Europe/Paris, the system prepares a forecast for every hour of the
-following local day. Demand is expressed in MW.
+following local day. Demand is expressed in MW. Archived weather inputs come
+from forecasts that were available before that issue time.
 
 ## Current version
 
@@ -18,7 +19,10 @@ The project currently includes:
 - Chronological train, validation, and test periods
 - MAE, RMSE, and WAPE evaluation against naïve baselines
 - Saved model artifacts, charts, metrics, and a model card
-- 25 automated tests
+- Archived ECMWF forecast-run download and checksum caching
+- Temperature, precipitation, and wind aligned to each target UTC hour
+- Strict rejection of weather published after the demand forecast cutoff
+- 37 automated tests
 
 ## Pipeline
 
@@ -27,6 +31,8 @@ flowchart LR
     A[RTE data] --> B[Validation]
     B --> C[Hourly UTC dataset]
     C --> D[Calendar and lag features]
+    W[Archived ECMWF run] --> X[Cutoff-safe weather features]
+    X --> D
     D --> E[Train 2022-2023]
     E --> F[Validate 2024]
     F --> G[Test 2025]
@@ -62,6 +68,7 @@ py -3 -m venv .venv
 
 .\.venv\Scripts\python.exe -m energyai.phase2 --year 2024
 .\.venv\Scripts\python.exe -m energyai.phase3
+.\.venv\Scripts\python.exe -m energyai.phase4 --start-date 2024-06-02 --end-date 2024-06-04
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
@@ -74,16 +81,20 @@ reports/phase3/test_predictions.png
 reports/phase3/error_slices.csv
 reports/phase3/model_card.md
 reports/phase3/reproducibility.json
+reports/phase4/weather_sample_summary.json
 ```
 
 ## Project structure
 
 ```text
-energyai/       data collection, features, baselines, and models
+energyai/       demand, weather, features, baselines, and models
 notebooks/      exploratory data analysis
 reports/        generated metrics, figures, and model documentation
 artifacts/      trained model files
 tests/          offline automated tests
 ```
 
-Data source: [RTE/ODRÉ éCO2mix](https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-cons-def/)
+Data sources:
+
+- [RTE/ODRÉ éCO2mix](https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-cons-def/)
+- [Open-Meteo Single Runs API](https://open-meteo.com/en/docs/single-runs-api)
