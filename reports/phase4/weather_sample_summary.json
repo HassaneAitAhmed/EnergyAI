@@ -1,0 +1,25 @@
+{
+  "source": "https://single-runs-api.open-meteo.com/v1/forecast",
+  "provider": "Open-Meteo",
+  "model_name": "ecmwf_ifs",
+  "location": "Paris representative point",
+  "target_local_start": "2024-06-02",
+  "target_local_end": "2024-06-04",
+  "target_days": 3,
+  "hourly_rows": 72,
+  "first_valid_time_utc": "2024-06-01T22:00:00+00:00",
+  "last_valid_time_utc": "2024-06-04T21:00:00+00:00",
+  "weather_runs_utc": [
+    "2024-06-01T00:00:00+00:00",
+    "2024-06-02T00:00:00+00:00",
+    "2024-06-03T00:00:00+00:00"
+  ],
+  "all_weather_available_before_issue": true,
+  "assumed_model_ready_delay_hours": 6,
+  "cache_hits": 0,
+  "temperature_2m_c_min": 8.7,
+  "temperature_2m_c_max": 21.3,
+  "precipitation_mm_total": 1.0,
+  "wind_speed_10m_kmh_max": 16.3,
+  "note": "This is archived forecast output from fixed model runs, not observed or reanalysis weather. One Paris point does not represent the full region."
+}
