@@ -175,6 +175,7 @@ def parse_weather_response(
     timestamp = downloaded_at.astimezone(UTC)
     result = frame.reset_index(names="valid_time_utc")
     result.insert(0, "forecast_issue_utc", run.forecast_issue_utc)
+    result.insert(0, "weather_available_at_utc", run.assumed_available_at_utc)
     result.insert(0, "weather_run_utc", run.weather_run_utc)
     result["latitude"] = float(payload["latitude"])
     result["longitude"] = float(payload["longitude"])
@@ -184,6 +185,7 @@ def parse_weather_response(
     return result[
         [
             "weather_run_utc",
+            "weather_available_at_utc",
             "forecast_issue_utc",
             "valid_time_utc",
             "latitude",
@@ -204,3 +206,65 @@ def read_weather_download(download: WeatherDownload, run: WeatherRun) -> pd.Data
     manifest = json.loads(download.manifest_path.read_text(encoding="utf-8"))
     downloaded_at = datetime.fromisoformat(manifest["downloaded_at_utc"])
     return parse_weather_response(payload, run, downloaded_at=downloaded_at)
+
+
+def join_weather_features(
+    demand_features: pd.DataFrame, weather: pd.DataFrame
+) -> pd.DataFrame:
+    """Join weather by valid UTC hour with strict as-of availability guards."""
+    demand_required = {"timestamp_utc", "issued_at_utc"}
+    weather_required = {
+        "valid_time_utc",
+        "weather_run_utc",
+        "weather_available_at_utc",
+        "forecast_issue_utc",
+        *WEATHER_VARIABLES,
+    }
+    missing_demand = demand_required.difference(demand_features.columns)
+    missing_weather = weather_required.difference(weather.columns)
+    if missing_demand or missing_weather:
+        raise ValueError(
+            "Missing join columns: "
+            f"demand={sorted(missing_demand)}, weather={sorted(missing_weather)}"
+        )
+
+    demand = demand_features.copy()
+    forecast = weather.copy()
+    demand["timestamp_utc"] = pd.to_datetime(demand["timestamp_utc"], utc=True)
+    demand["issued_at_utc"] = pd.to_datetime(demand["issued_at_utc"], utc=True)
+    for column in (
+        "valid_time_utc",
+        "weather_run_utc",
+        "weather_available_at_utc",
+        "forecast_issue_utc",
+    ):
+        forecast[column] = pd.to_datetime(forecast[column], utc=True)
+    if demand["timestamp_utc"].duplicated().any():
+        raise ValueError("Demand features contain duplicate target timestamps")
+    if forecast["valid_time_utc"].duplicated().any():
+        raise ValueError("Weather data contains duplicate valid timestamps")
+
+    joined = demand.merge(
+        forecast,
+        how="left",
+        left_on="timestamp_utc",
+        right_on="valid_time_utc",
+        validate="one_to_one",
+    )
+    if joined["valid_time_utc"].isna().any():
+        raise ValueError("Weather data does not cover every demand target hour")
+    if not joined["issued_at_utc"].eq(joined["forecast_issue_utc"]).all():
+        raise ValueError("Weather issue metadata does not match demand issuance")
+    if (joined["weather_run_utc"] > joined["issued_at_utc"]).any():
+        raise ValueError("Weather run is later than demand forecast issuance")
+    if (joined["weather_available_at_utc"] > joined["issued_at_utc"]).any():
+        raise ValueError("Weather data became available after forecast issuance")
+
+    joined = joined.drop(columns="valid_time_utc")
+    return joined.rename(
+        columns={
+            "temperature_2m": "weather_temperature_2m_c",
+            "wind_speed_10m": "weather_wind_speed_10m_kmh",
+            "precipitation": "weather_precipitation_mm",
+        }
+    )
