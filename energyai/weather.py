@@ -12,7 +12,7 @@ from typing import Any
 import pandas as pd
 import requests
 
-from energyai.features import forecast_issue_time
+from energyai.features import forecast_issue_time, target_hours
 from energyai.rte import retrying_session
 
 SINGLE_RUNS_URL = "https://single-runs-api.open-meteo.com/v1/forecast"
@@ -126,3 +126,81 @@ def download_weather_run(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     return WeatherDownload(response_path, manifest_path, False)
+
+
+def parse_weather_response(
+    payload: dict[str, Any],
+    run: WeatherRun,
+    *,
+    downloaded_at: datetime,
+) -> pd.DataFrame:
+    """Validate an archived response and keep the exact local target-day hours."""
+    if run.assumed_available_at_utc > run.forecast_issue_utc:
+        raise ValueError("Weather run availability is later than forecast issuance")
+    hourly = payload.get("hourly")
+    units = payload.get("hourly_units")
+    if not isinstance(hourly, dict) or not isinstance(units, dict):
+        raise TypeError("Weather response is missing hourly data or units")
+    expected_units = {
+        "temperature_2m": "°C",
+        "precipitation": "mm",
+        "wind_speed_10m": "km/h",
+    }
+    for variable, expected_unit in expected_units.items():
+        if units.get(variable) != expected_unit:
+            raise ValueError(f"Unexpected unit for {variable}: {units.get(variable)!r}")
+    required = {"time", *WEATHER_VARIABLES}
+    missing = required.difference(hourly)
+    if missing:
+        raise ValueError(f"Weather response is missing fields: {sorted(missing)}")
+    lengths = {field: len(hourly[field]) for field in required}
+    if len(set(lengths.values())) != 1:
+        raise ValueError("Weather hourly arrays have different lengths")
+
+    frame = pd.DataFrame({field: hourly[field] for field in required})
+    frame["valid_time_utc"] = pd.to_datetime(
+        frame.pop("time"), utc=True, errors="coerce"
+    )
+    if frame["valid_time_utc"].isna().any():
+        raise ValueError("Weather response contains invalid timestamps")
+    if frame["valid_time_utc"].duplicated().any():
+        raise ValueError("Weather response contains duplicate timestamps")
+    targets = target_hours(run.target_local_date)
+    frame = frame.set_index("valid_time_utc").reindex(targets)
+    if frame[list(WEATHER_VARIABLES)].isna().any().any():
+        raise ValueError("Weather run does not cover every target hour")
+    for variable in WEATHER_VARIABLES:
+        frame[variable] = pd.to_numeric(frame[variable], errors="raise")
+
+    timestamp = downloaded_at.astimezone(UTC)
+    result = frame.reset_index(names="valid_time_utc")
+    result.insert(0, "forecast_issue_utc", run.forecast_issue_utc)
+    result.insert(0, "weather_run_utc", run.weather_run_utc)
+    result["latitude"] = float(payload["latitude"])
+    result["longitude"] = float(payload["longitude"])
+    result["provider"] = "Open-Meteo"
+    result["model_name"] = WEATHER_MODEL
+    result["downloaded_at_utc"] = pd.Timestamp(timestamp)
+    return result[
+        [
+            "weather_run_utc",
+            "forecast_issue_utc",
+            "valid_time_utc",
+            "latitude",
+            "longitude",
+            "temperature_2m",
+            "wind_speed_10m",
+            "precipitation",
+            "provider",
+            "model_name",
+            "downloaded_at_utc",
+        ]
+    ]
+
+
+def read_weather_download(download: WeatherDownload, run: WeatherRun) -> pd.DataFrame:
+    """Read a cached response and its recorded download timestamp."""
+    payload = json.loads(download.response_path.read_text(encoding="utf-8"))
+    manifest = json.loads(download.manifest_path.read_text(encoding="utf-8"))
+    downloaded_at = datetime.fromisoformat(manifest["downloaded_at_utc"])
+    return parse_weather_response(payload, run, downloaded_at=downloaded_at)
